@@ -1,0 +1,94 @@
+/* Styles for Centro de Operações - painel vertical premium */
+.centro-operacoes-view .panel-wide {
+  padding: 28px;
+  margin: 20px;
+  background: var(--bg);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.centro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+.centro-header .titles span {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.8;
+}
+.centro-header .titles h2 {
+  margin: 6px 0 0;
+}
+
+.top-stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.stat-pill {
+  background: var(--code-bg);
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: none;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.toolbar-row { margin: 18px 0; display:flex; justify-content:space-between; align-items:center }
+.filter-buttons { display:flex; gap:10px }
+.filter-button {
+  padding:8px 12px; border-radius:8px; background:transparent; border:1px solid var(--border); cursor:pointer; transition:all .25s; font-weight:600
+}
+.filter-button.active { background:var(--accent-bg); border-color:var(--accent-border); transform:translateY(-3px)}
+
+.flow-wrap { display:flex; justify-content:center; }
+.flow-column { width:100%; max-width:920px; display:flex; flex-direction:column; align-items:stretch; gap:18px }
+
+.posto-card {
+  display:flex; gap:18px; align-items:center; padding:20px; border-radius:12px; box-shadow:var(--shadow); background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  transition:transform .35s, opacity .35s;
+}
+.posto-card.hidden { opacity:0; transform:translateX(-20px); pointer-events:none }
+.posto-left {
+  min-width:120px; padding:12px 16px; border-radius:10px; color:white; display:flex; flex-direction:column; gap:8px; align-items:flex-start; font-weight:700;
+}
+.posto-body { flex:1; display:flex; justify-content:space-between; align-items:center }
+.posto-info { text-align:left }
+.posto-info strong { display:block; font-size:18px }
+.posto-info .meta { margin-top:6px; color:var(--text); font-weight:600 }
+.posto-status { display:flex; gap:10px; align-items:center }
+.status-dot { width:12px; height:12px; border-radius:50% }
+
+.posto-connector { text-align:center; font-size:28px; color:var(--text); opacity:0.6 }
+
+/* Colors per posto */
+.c-clamp { background:#1e88e5 }
+.c-ponte { background:#2e7d32 }
+.c-cabeb { background:#fb8c00 }
+.c-cabec { background:#e53935 }
+.c-mesa { background:#fbc02d }
+.c-forra { background:#6a1b9a }
+.c-slitter { background:#6b7280 }
+.c-empilh { background:#0d47a1 }
+.c-saida { background:#1b5e20 }
+
+/* Status colors */
+.s-operando { background: #2ecc71 }
+.s-treinamento { background: #f1c40f }
+.s-ausente { background: #e74c3c }
+.s-ferias { background: #6b7280 }
+
+.empty-state { color: var(--text); font-weight:700 }
+.empty-state .material-icons { vertical-align:middle; margin-right:8px }
+
+@media (max-width: 720px) {
+  .posto-card { flex-direction:column; align-items:flex-start }
+  .posto-left { width:100%; min-width:0 }
+  .posto-body { width:100%; }
+}
