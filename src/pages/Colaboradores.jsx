@@ -14,7 +14,7 @@ const emptyForm = {
 };
 
 function Colaboradores() {
-  const { colaboradores, addColaborador, updateColaborador, removeColaborador } = useContext(ColaboradoresContext);
+  const { colaboradores, addColaborador, updateColaborador, removeColaborador, loading } = useContext(ColaboradoresContext);
   const [searchField, setSearchField] = useState('nome');
   const [searchValue, setSearchValue] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +46,7 @@ function Colaboradores() {
     setFormState(emptyForm);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const payload = {
       nome: formState.nome,
@@ -61,17 +61,17 @@ function Colaboradores() {
     };
 
     if (editingId) {
-      updateColaborador(editingId, payload);
+      await updateColaborador(editingId, payload);
     } else {
-      addColaborador(payload);
+      await addColaborador(payload);
     }
 
     closeModal();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Tem certeza de que deseja excluir este colaborador?')) {
-      removeColaborador(id);
+      await removeColaborador(id);
     }
   };
 
@@ -101,7 +101,7 @@ function Colaboradores() {
               onChange={(event) => setSearchValue(event.target.value)}
             />
           </div>
-          <button type="button" className="btn btn-primary" onClick={() => openModal()}>Novo colaborador</button>
+          <button type="button" className="btn btn-primary" onClick={() => openModal()}>Novo Colaborador</button>
         </div>
 
         <div className="table-wrap">
@@ -120,22 +120,28 @@ function Colaboradores() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((colaborador) => (
-                <tr key={colaborador.id}>
-                  <td>{colaborador.nome}</td>
-                  <td>{colaborador.matricula}</td>
-                  <td>{colaborador.turno}</td>
-                  <td>{colaborador.funcao}</td>
-                  <td>{colaborador.linha}</td>
-                  <td>{colaborador.posto}</td>
-                  <td>{colaborador.situacao}</td>
-                  <td>{colaborador.telefone}</td>
-                  <td>
-                    <button type="button" className="btn btn-secondary" onClick={() => openModal(colaborador)}>Editar</button>
-                    <button type="button" className="btn btn-danger" onClick={() => handleDelete(colaborador.id)}>Excluir</button>
-                  </td>
+              {loading ? (
+                <tr>
+                  <td colSpan="9">Carregando colaboradores...</td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map((colaborador) => (
+                  <tr key={colaborador.id}>
+                    <td>{colaborador.nome}</td>
+                    <td>{colaborador.matricula}</td>
+                    <td>{colaborador.turno}</td>
+                    <td>{colaborador.funcao}</td>
+                    <td>{colaborador.linha}</td>
+                    <td>{colaborador.posto}</td>
+                    <td>{colaborador.situacao}</td>
+                    <td>{colaborador.telefone}</td>
+                    <td>
+                      <button type="button" className="btn btn-secondary" onClick={() => openModal(colaborador)}>Editar</button>
+                      <button type="button" className="btn btn-danger" onClick={() => handleDelete(colaborador.id)}>Excluir</button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

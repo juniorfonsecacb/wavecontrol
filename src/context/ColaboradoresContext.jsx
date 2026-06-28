@@ -1,63 +1,95 @@
-import { createContext, useEffect, useState } from 'react';
-import initialColaboradores from '../data/colaboradores';
+import { createContext, useEffect, useState } from 'react'
+import { supabase } from '../services/supabase'
 
-export const ColaboradoresContext = createContext(null);
-
-const STORAGE_KEY = 'wavecontrol_colaboradores';
-
-function generateId() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-}
+export const ColaboradoresContext = createContext()
 
 export function ColaboradoresProvider({ children }) {
-  const [colaboradores, setColaboradores] = useState(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      } catch (error) {
-        console.warn('Falha ao ler colaboradores do localStorage', error);
-      }
+  const [colaboradores, setColaboradores] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  async function carregarColaboradores() {
+    setLoading(true)
+
+    const { data, error } = await supabase
+      .from('colaboradores')
+      .select('*')
+      .order('nome')
+
+    setLoading(false)
+
+    if (error) {
+      console.error('Erro ao carregar colaboradores:', error)
+      return []
     }
 
-    return initialColaboradores.map((item) => ({
-      id: item.id ?? generateId(),
-      matricula: item.matricula ?? '',
-      telefone: item.telefone ?? '',
-      observacoes: item.observacoes ?? '',
-      ...item,
-    }));
-  });
+    setColaboradores(data ?? [])
+    return data ?? []
+  }
+
+  async function addColaborador(payload) {
+    const { data, error } = await supabase
+      .from('colaboradores')
+      .insert(payload)
+      .select('*')
+      .single()
+
+    if (error) {
+      console.error('Erro ao adicionar colaborador:', error)
+      return null
+    }
+
+    await carregarColaboradores()
+    return data
+  }
+
+  async function updateColaborador(id, payload) {
+    const { data, error } = await supabase
+      .from('colaboradores')
+      .update(payload)
+      .eq('id', id)
+      .select('*')
+      .single()
+
+    if (error) {
+      console.error('Erro ao atualizar colaborador:', error)
+      return null
+    }
+
+    await carregarColaboradores()
+    return data
+  }
+
+  async function removeColaborador(id) {
+    const { error } = await supabase
+      .from('colaboradores')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Erro ao remover colaborador:', error)
+      return false
+    }
+
+    await carregarColaboradores()
+    return true
+  }
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(colaboradores));
-  }, [colaboradores]);
-
-  const addColaborador = (colaborador) => {
-    setColaboradores((current) => [
-      { ...colaborador, id: generateId() },
-      ...current,
-    ]);
-  };
-
-  const updateColaborador = (id, updates) => {
-    setColaboradores((current) =>
-      current.map((item) => (item.id === id ? { ...item, ...updates } : item)),
-    );
-  };
-
-  const removeColaborador = (id) => {
-    setColaboradores((current) => current.filter((item) => item.id !== id));
-  };
+    carregarColaboradores()
+  }, [])
 
   return (
     <ColaboradoresContext.Provider
-      value={{ colaboradores, addColaborador, updateColaborador, removeColaborador }}
+      value={{
+        colaboradores,
+        loading,
+        carregarColaboradores,
+        addColaborador,
+        updateColaborador,
+        removeColaborador,
+      }}
     >
       {children}
     </ColaboradoresContext.Provider>
-  );
+  )
 }
